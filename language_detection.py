@@ -23,7 +23,7 @@ y = le.fit_transform(y)
 data_list = []
 for text in X:
     text = re.sub(r'[!@#$(),\n"%^*?\:;~`0-9]', ' ', text)
-    text = re.sub(r'[[]]', ' ', text)
+    text = re.sub(r'\[\]', ' ', text)
     text = text.lower()
     data_list.append(text)
 
@@ -52,13 +52,13 @@ st.write("Enter text in the sidebar to detect its language.")
 # Sidebar for language detection
 text_input = st.sidebar.text_area("Enter text:", height=300, max_chars=None)  # Setting max_chars to None for unlimited input
 
-target_language = st.sidebar.text_input("Enter target language for translation (e.g., 'German', 'French'):")
+target_language = st.sidebar.text_input("Enter target language for translation (e.g., 'de' for German, 'fr' for French):")
 
 prediction = ""  # Initialize prediction with an empty string
 
 if st.sidebar.button("Detect Language", key="detect_language"):
     text_input = re.sub(r'[!@#$(),\n"%^*?\:;~`0-9]', ' ', text_input)
-    text_input = re.sub(r'[[]]', ' ', text_input)
+    text_input = re.sub(r'\[\]', ' ', text_input)
     text_input = text_input.lower()
 
     user_input = vectorizer.transform([text_input])
@@ -83,7 +83,11 @@ st.sidebar.text("Developed by Jawad Ahmad")
 
 # Optional: Add a translation button
 if prediction and target_language:
-    translator = Translator()
-    translated_text = translator.translate(text_input, src=prediction, dest=target_language).text
-    st.subheader(f"Translated Text (to {target_language}):")
-    st.write(translated_text)
+    try:
+        translator = Translator()
+        translated_text = translator.translate(text_input, src=prediction, dest=target_language).text
+        st.subheader(f"Translated Text (to {target_language}):")
+        st.write(translated_text)
+    except Exception as e:
+        st.sidebar.subheader("Translation Error:")
+        st.sidebar.write(str(e))
